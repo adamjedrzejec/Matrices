@@ -8,6 +8,7 @@ class Matrix{
 	struct rcmat;
 private:
 	rcmat *mat;
+	void detach();
 public:
 	Matrix();
 	Matrix(unsigned int, unsigned int);
@@ -15,7 +16,6 @@ public:
 	~Matrix();
 	bool checkDimensions(const Matrix&);
 	bool canMultiply(const Matrix&);
-	void detach();
 	double operator()(unsigned int, unsigned int) const;
 	bool operator==(const Matrix& m);
 	Matrix& operator+=(const Matrix&);

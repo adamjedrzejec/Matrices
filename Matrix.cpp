@@ -238,8 +238,8 @@ ostream & operator<<(ostream& out, const Matrix& mx) {
 istream & operator>>(istream& in, Matrix& mx) {
 	unsigned int sizeX = 0, sizeY = 0;
 
-	if(in == cin)
-		cout << "Put dimensions: ";
+	// if(in == cin)
+	// 	cout << "Put dimensions: ";
 
 	while(sizeX == 0 || sizeY == 0){
 		try{
@@ -257,8 +257,8 @@ istream & operator>>(istream& in, Matrix& mx) {
 		catch(WrongInput& e){
 			cerr << e.what() << endl;
 
-			if (in != cin)
-				abort();
+			// if (in != cin)
+			// 	abort();
 		}
 	}
 
