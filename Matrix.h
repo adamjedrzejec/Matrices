@@ -24,7 +24,6 @@ public:
 	Matrix operator+(const Matrix&);
 	Matrix operator-(const Matrix&);
 	Matrix operator*(const Matrix&);
-
 	void operator= (const Matrix&);
 	friend ostream & operator<<(ostream&, const Matrix&);
 	friend istream & operator>>(istream&, Matrix&);

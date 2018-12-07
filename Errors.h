@@ -7,7 +7,7 @@ struct WrongInput : public exception {
 	}
 };
 
-struct DifferentMatrixDimensions : public exception {
+struct WrongMatrixDimensions : public exception {
 	const char* what () const throw () {
 		return "Matrices have invalid dimensions";
 	}

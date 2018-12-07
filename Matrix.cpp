@@ -75,10 +75,10 @@ Matrix::rcmat::rcmat(unsigned int sizeX, unsigned int sizeY, double** data)
 Matrix::rcmat::~rcmat(){
 
 	for (unsigned int i = 0; i < sizeY; i++) {
-		delete data[i];
+		delete[] data[i];
 	}
 
-	delete data;
+	delete[] data;
 }
 
 
@@ -111,62 +111,47 @@ void Matrix::detach()
 }
 
 
-bool Matrix::operator==(const Matrix& m)
+bool Matrix::operator==(const Matrix& mx)
 {
-	return (this->mat) == (m.mat);
+	return (this->mat) == (mx.mat);
 }
 
 
 Matrix& Matrix::operator+=(const Matrix& mx){
-	try
+
+	if(this->checkDimensions(mx))
 	{
-		if(this->checkDimensions(mx))
+		this->detach();
+		for(unsigned int i = 0; i < this->mat->sizeY; i++)
 		{
-			this->detach();
-			for(unsigned int i = 0; i < this->mat->sizeY; i++)
+			for(unsigned int j = 0; j < this->mat->sizeX; j++)
 			{
-				for(unsigned int j = 0; j < this->mat->sizeX; j++)
-				{
-					this->mat->data[i][j] += mx.mat->data[i][j];
-				}
+				this->mat->data[i][j] += mx.mat->data[i][j];
 			}
-			return *this;
 		}
-		else abort();
-			throw DifferentMatrixDimensions();
+		return *this;
 	}
-	catch(DifferentMatrixDimensions& e)
-	{
-		cerr << e.what() << endl;
-		abort();
-	}
+	else abort();
+		throw WrongMatrixDimensions();
 }
 
 
 Matrix& Matrix::operator-=(const Matrix& mx)
 {
-	try
+	if(this->checkDimensions(mx))
 	{
-		if(this->checkDimensions(mx))
+		this->detach();
+		for(unsigned int i = 0; i < this->mat->sizeY; i++)
 		{
-			this->detach();
-			for(unsigned int i = 0; i < this->mat->sizeY; i++)
+			for(unsigned int j = 0; j < this->mat->sizeX; j++)
 			{
-				for(unsigned int j = 0; j < this->mat->sizeX; j++)
-				{
-					this->mat->data[i][j] -= mx.mat->data[i][j];
-				}
+				this->mat->data[i][j] -= mx.mat->data[i][j];
 			}
-			return *this;
 		}
-		else
-			throw DifferentMatrixDimensions();
+		return *this;
 	}
-	catch(DifferentMatrixDimensions& e)
-	{
-		cerr << e.what() << endl;
-		abort();
-	}
+	else
+		throw WrongMatrixDimensions();
 }
 
 
@@ -195,32 +180,25 @@ Matrix Matrix::operator-(const Matrix& mx)
 
 Matrix Matrix::operator*(const Matrix& mx)
 {
-	try
+	if(this->canMultiply(mx))
 	{
-		if(this->canMultiply(mx))
-		{
-			Matrix newMat(this->mat->sizeX, mx.mat->sizeY);
+		Matrix newMat(this->mat->sizeX, mx.mat->sizeY);
 
-			for(unsigned int i = 0; i < this->mat->sizeY; i++)
+		for(unsigned int i = 0; i < this->mat->sizeY; i++)
+		{
+			for(unsigned int j = 0; j < mx.mat->sizeX; j++)
 			{
-				for(unsigned int j = 0; j < mx.mat->sizeX; j++)
+				newMat.mat->data[i][j] = 0;
+				for (unsigned int compI = 0; compI < mx.mat->sizeX; compI++)
 				{
-					for (unsigned int compI = 0; compI < mx.mat->sizeX; compI++)
-					{
-						newMat.mat->data[i][j] += (mx.mat->data[i][compI] * mx.mat->data[compI][j]);
-					}
+					newMat.mat->data[i][j] += (mx.mat->data[i][compI] * mx.mat->data[compI][j]);
 				}
 			}
-			return newMat;
 		}
-		else
-			throw DifferentMatrixDimensions();
+		return newMat;
 	}
-	catch(DifferentMatrixDimensions& e)
-	{
-		cerr << e.what() << endl;
-		abort();
-	}
+	else
+		throw WrongMatrixDimensions();
 }
 
 
@@ -258,34 +236,36 @@ ostream & operator<<(ostream& out, const Matrix& mx) {
 
 
 istream & operator>>(istream& in, Matrix& mx) {
-	unsigned int sizeX, sizeY;
+	unsigned int sizeX = 0, sizeY = 0;
 
-	cout << "Put dimensions: ";
+	if(in == cin)
+		cout << "Put dimensions: ";
 
-
-	try{
-		while(true){
-			if(in >> sizeY && in >> sizeX)
-				break;
-			else{
-				in.clear();
-				in.ignore();
-				throw WrongInput();
+	while(sizeX == 0 || sizeY == 0){
+		try{
+			while(true){
+				if((in >> sizeY) && (in >> sizeX))
+					break;
+				else{
+					fflush(stdin);
+					in.clear();
+					in.ignore();
+					throw WrongInput();
+				}
 			}
 		}
-	}
-	catch(WrongInput& e){
-		cerr << e.what() << endl;
-		abort();
+		catch(WrongInput& e){
+			cerr << e.what() << endl;
+
+			if (in != cin)
+				abort();
+		}
 	}
 
-	mx.detach();
-	
 	if(mx.mat)
 		delete mx.mat;
 
 	mx.mat = new Matrix::rcmat(sizeX, sizeY);
-	// if(!mx.mat || mx.mat->sizeX != sizeX || mx.mat->sizeY != sizeY)
 
 	cout << "Fill in " << mx.mat->sizeY << "x" << mx.mat->sizeX << " matrix:" << endl;
 	for(unsigned int i = 0; i < mx.mat->sizeY; i++) {
@@ -309,29 +289,3 @@ istream & operator>>(istream& in, Matrix& mx) {
 	}
 	return in;
 }
-
-
-// Matrix & Matrix::operator= (const Matrix& m) {
-
-// 	if(!this->mat)
-// 		this->mat = new rcmat(m.mat->sizeX, m.mat->sizeY);
-
-// 	for (unsigned int i = 0; i < this->mat->sizeY; i++) {
-// 		delete this->mat->data[i];
-// 	}
-// 	delete this->mat->data;
-
-// 	this->mat->sizeX = m.mat->sizeX;
-// 	this->mat->sizeY = m.mat->sizeY;
-
-// 	this->mat->data = new double* [this->mat->sizeY];
-
-// 	for (unsigned int i = 0; i < this->mat->sizeY; i++) {
-// 		this->mat->data[i] = new double [this->mat->sizeX];
-// 		for (unsigned int j = 0; j < this->mat->sizeX; j++) {
-// 			this->mat->data[i][j] = m.mat->data[i][j];
-// 		}
-// 	}
-
-// 	return *this;
-// }
