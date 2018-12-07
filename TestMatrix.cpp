@@ -10,10 +10,14 @@ int main() {
 		m1 = m2;
 		m3 = m2;
 		
-		
 		cout << "m2 matrix: " << m2 << endl;
 		
-		cout << "m2(2,1): " << m2(2,1) << endl << endl;
+
+		try{
+			cout << "m2(2,1): " << m2(2,1) << endl << endl;
+		} catch (NoSuchElement& e) {
+			cerr << e.what() << endl;
+		}
 		
 		//m2(2,1) = 3;
 		

@@ -12,3 +12,15 @@ struct WrongMatrixDimensions : public exception {
 		return "Matrices have invalid dimensions";
 	}
 };
+
+struct NoSuchElement : public exception {
+	const char* what () const throw () {
+		return "<< element of these coordinates does not exist >>";
+	}
+};
+
+struct NoMatrixExists : public exception {
+	const char* what () const throw () {
+		return "Matrix has not been created properly";
+	}
+};

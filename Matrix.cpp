@@ -85,7 +85,8 @@ Matrix::rcmat::~rcmat(){
 double Matrix::operator()(unsigned int x, unsigned int y) const{
 	if(this->mat->sizeX >= y && this->mat->sizeY >= x)
 		return mat->data[x-1][y-1];
-	else abort();
+	else
+		throw NoSuchElement();
 }
 
 
@@ -102,7 +103,7 @@ bool Matrix::canMultiply(const Matrix& mx)
 
 
 void Matrix::detach()
-{	
+{
 	if(mat)
 		if(mat->refCount > 1){
 			mat->refCount--;
@@ -236,54 +237,36 @@ ostream & operator<<(ostream& out, const Matrix& mx) {
 
 
 istream & operator>>(istream& in, Matrix& mx) {
-	unsigned int sizeX = 0, sizeY = 0;
 
-	// if(in == cin)
-	// 	cout << "Put dimensions: ";
+	unsigned int sizeX, sizeY;
 
-	while(sizeX == 0 || sizeY == 0){
-		try{
-			while(true){
-				if((in >> sizeY) && (in >> sizeX))
-					break;
-				else{
-					fflush(stdin);
-					in.clear();
-					in.ignore();
-					throw WrongInput();
-				}
-			}
+	if (!mx.mat){
+		if(&in == &cin)
+			cout << "Put dimensions: ";
+
+		while(true){
+			if((in >> sizeY) && (in >> sizeX))
+				break;
+			else
+				throw WrongInput();
 		}
-		catch(WrongInput& e){
-			cerr << e.what() << endl;
 
-			// if (in != cin)
-			// 	abort();
-		}
+		mx.mat = new Matrix::rcmat(sizeX, sizeY);
 	}
 
-	if(mx.mat)
-		delete mx.mat;
+	if (!mx.mat)
+		throw NoMatrixExists();
 
-	mx.mat = new Matrix::rcmat(sizeX, sizeY);
+	if(&in == &cin)
+		cout << "Fill in " << mx.mat->sizeY << "x" << mx.mat->sizeX << " matrix:" << endl;
 
-	cout << "Fill in " << mx.mat->sizeY << "x" << mx.mat->sizeX << " matrix:" << endl;
 	for(unsigned int i = 0; i < mx.mat->sizeY; i++) {
 		for(unsigned int j = 0; j < mx.mat->sizeX; j++) {
-			try{
-				while(true){
-					if(in >> mx.mat->data[i][j])
-						break;
-					else{
-						in.clear();
-						in.ignore();
-						throw WrongInput();
-					}
-				}
-			}
-			catch(WrongInput& e){
-				cerr << e.what() << endl;
-				abort();
+			while(true){
+				if(in >> mx.mat->data[i][j])
+					break;
+				else
+					throw WrongInput();
 			}
 		}
 	}
