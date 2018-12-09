@@ -1,6 +1,8 @@
 #include "Matrix.h"
 #include "Errors.h"
 
+#include <iostream>
+
 using namespace std;
 
 int main() {
@@ -19,7 +21,7 @@ int main() {
 			cerr << e.what() << endl;
 		}
 		
-		//m2(2,1) = 3;
+		m2(2,1) = 3;
 		
 		m4 = m2;
 		m4 += m1;
