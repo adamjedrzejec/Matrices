@@ -82,14 +82,6 @@ Matrix::rcmat::~rcmat(){
 }
 
 
-// double Matrix::operator()(unsigned int x, unsigned int y) const{
-// 	if(this->mat->sizeX >= y && this->mat->sizeY >= x)
-// 		return mat->data[x-1][y-1];
-// 	else
-// 		throw NoSuchElement();
-// }
-
-
 bool Matrix::checkDimensions(const Matrix& mx)
 {
 	return (mat->sizeX == mx.mat->sizeX && mat->sizeY == mx.mat->sizeY);
@@ -276,13 +268,15 @@ istream & operator>>(istream& in, Matrix& mx) {
 
 Matrix::Mref Matrix::operator()(unsigned int x, unsigned int y)
 {
-	return Mref(*this, x, y);
+	if (x - 1 > this->mat->sizeX || y - 1 > this->mat->sizeY)
+		throw NoSuchElement();
+	return Mref(*this, x - 1, y - 1);
 }
 
 
 Matrix::Mref::operator double() const
 {
-	return mx.mat->data[sizeY][sizeX];
+	return mx.mat->data[sizeX][sizeY];
 }
 
 

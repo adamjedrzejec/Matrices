@@ -9,14 +9,15 @@ class Matrix{
 private:
 	rcmat *mat;
 	void detach();
+	bool checkDimensions(const Matrix&);
+	bool canMultiply(const Matrix&);
 public:
 	class Mref;
 	Matrix();
 	Matrix(unsigned int, unsigned int);
 	Matrix(const Matrix&);
 	~Matrix();
-	bool checkDimensions(const Matrix&);
-	bool canMultiply(const Matrix&);
+	
 	Mref operator()(unsigned int x, unsigned int y);
 	//double operator()(unsigned int, unsigned int) const;
 	bool operator==(const Matrix& m);
@@ -38,7 +39,6 @@ struct Matrix::rcmat {
 	rcmat(unsigned int, unsigned int);
 	rcmat(unsigned int, unsigned int, double**);
 	~rcmat();
-	//friend istream & operator>>(istream&, const Matrix&);
 };
 
 

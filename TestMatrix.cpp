@@ -16,9 +16,9 @@ int main() {
 		
 
 		try{
-			cout << "m2(2,1): " << m2(2,1) << endl << endl;
+			cout << "m2(2,3): " << m2(2,3) << endl << endl;
 		} catch (NoSuchElement& e) {
-			cerr << e.what() << endl;
+			cerr << e.what() << endl << endl;
 		}
 		
 		m2(2,1) = 3;
